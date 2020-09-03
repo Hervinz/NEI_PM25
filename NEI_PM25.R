@@ -1,0 +1,31 @@
+####This code reads a data set from he National Emissions Inventory (NEI).
+#This database is known as the National Emissions Inventory (NEI).
+#this is the information about emissions of fine particulate matter PM2.5.
+#The goal is to explore the National Emissions Inventory database 
+#and see what it say about fine particulate matter pollution in the United states 
+#over the 10-year period 1999-2008.  
+
+
+####DONWLOADING, UNZIPPING AND READING FILES
+if(!file.exists("./summarySCC_PM25.rds")) {
+        fileUrl <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
+        download.file(url = fileUrl, destfile = "data_PM25_emissions.zip")
+        unzip(zipfile = "data_PM25_emissions.zip")
+}
+
+NEI <- readRDS("summarySCC_PM25.rds")
+SCC <- readRDS("Source_Classification_Code.rds")
+
+
+##Have total emissions from PM2.5 decreased in the United States from 1999 to 2008?
+#Using the base plotting system, make a plot showing the total PM2.5 emission from all
+#sources for each of the years 1999, 2002, 2005, and 2008.
+
+yr1999 <- NEI[with(NEI, year == 1999),]
+yr2002 <- NEI[with(NEI, year == 2002),]
+yr2005 <- NEI[with(NEI, year == 2005),]
+yr2008 <- NEI[with(NEI, year == 2008),]
+
+
+
+
