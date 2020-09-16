@@ -15,6 +15,7 @@ if(!file.exists("./summarySCC_PM25.rds")) {
 
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
+NEI$year <- as.factor(NEI$year)
 
 
 
@@ -24,20 +25,8 @@ SCC <- readRDS("Source_Classification_Code.rds")
 #Using the base plotting system, make a plot showing the total PM2.5 emission from all
 #sources for each of the years 1999, 2002, 2005, and 2008.
 
-yr1999 <- NEI[with(NEI, year == 1999),4]
-yr2002 <- NEI[with(NEI, year == 2002),4]
-yr2005 <- NEI[with(NEI, year == 2005),4]
-yr2008 <- NEI[with(NEI, year == 2008),4]
 
-summary(yr1999)
-summary(yr2002)
-summary(yr2005)
-summary(yr2008)
-
-##Both the mean and the maximum value of the different samples
-#allow us to supous that there is a reduction in the total PM25 
-#particulate material in the course of 1999, 2002, 2005 and 2008, 
-#it is possible also be seen in the boxplot, especially in the logarithmic base 10 boxplot.
+NEI_Year <- sapply(split(NEI[,4], NEI$year), sum)
 
 ##sAVING PLOT IN PNG FILE.
 #Open png file
@@ -45,10 +34,12 @@ png(filename = "plot1.png", width = 480, height = 480, units = "px", pointsize =
     bg = "white", res = NA, family = "", restoreConsole = TRUE)
 
 #Boxplot creation
-#boxplot(yr1999, yr2002, yr2005, yr2008)
-boxplot(log10(yr1999), log10(yr2002), log10(yr2005), log10(yr2008))
+barplot(NEI_Year, xlab = "Year",
+        ylab = expression("Total PM"['25']*" emissions"), 
+        main = expression("Total PM"['25']*" emissions per year in the United States"))
+
 
 #Close png file
 dev.off() 
 
-
+# Total emissions from PM2.5 have decreased in the United States from 1999 to 2008.

@@ -23,7 +23,10 @@ SCC <- readRDS("Source_Classification_Code.rds")
 #California (fips == "06037").
 #Which city has seen greater changes over time in motor vehicle emissions?
 
-NEI_MS_BC_LA <- NEI[NEI$SCC %in% MobileSources & NEI$fips == "24510" | NEI$fips == "06037", c(1, 4,6)]
+library(ggplot2)
+NEI_MS_df <- NEI[NEI$SCC %in% MobileSources & NEI$fips == "24510" | NEI$fips == "06037", c(1,4,6)]
+NEI_MS_BC_LA <-aggregate(Emissions ~ year + fips, NEI_MS_df, sum)
+
 
 ##sAVING PLOT IN PNG FILE.
 #Open png file
@@ -31,15 +34,8 @@ png(filename = "plot6.png", width = 480, height = 480, units = "px", pointsize =
     bg = "white", res = NA, family = "", restoreConsole = TRUE)
 
 #Boxplot creation
-p <- ggplot(NEI_MS_BC_LA, aes(x=year, y=log10(Emissions), group=year))+ geom_boxplot()
-p <- p + facet_grid(fips ~ .)
-p <- p + stat_summary(fun.y=mean, geom="point", shape=20, size=4, color = "red")
+p <- ggplot(NEI_MS_BC_LA, aes(x=year, y=Emissions, color=fips))+ geom_line() + geom_point() + ylab(expression("Total PM"['25']*" Emissions"))+ ggtitle(expression("Total emissions from motor vehicle: Comparison between LA County [06037] and Baltimore City [24510]"))
 p
 
 #Close png file
 dev.off()
-
-#Between 1999 and 2008, a greater magnitude of change is observed in the city of LA,
-#explained by the reduction that occurred in 2008. However, if the reduction in 2008 
-#in California is not taken into account, it is observed a more sustained 
-#(albeit gradual) reduction in Baltimore City.

@@ -16,22 +16,20 @@ if(!file.exists("./summarySCC_PM25.rds")) {
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
 
+
+
 ##########################################################################################
 ##########################################################################################
 ## 3. Of the four types of sources indicated by the type
 #(point, nonpoint, onroad, nonroad) variable, which of these four sources
-#have seen decreases in emissions from 1999–2008 for Baltimore City? 
-#Which have seen increases in emissions from 1999–2008? Use the ggplot2 
+#have seen decreases in emissions from 1999-2008 for Baltimore City? 
+#Which have seen increases in emissions from 1999-2008? Use the ggplot2 
 #plotting system to make a plot answer this question.
 
 library(ggplot2)
-unique(BC_Mryld$type)
 BC_Mryld$type <- as.factor(BC_Mryld$type)
-
-PM25_S.POINT <- BC_Mryld[BC_Mryld[,5]=="POINT",c(4,6)]
-PM25_S.NONPOINT <- BC_Mryld[BC_Mryld[,5]=="NONPOINT",c(4,6)]
-PM25_S.ON_ROAD <- BC_Mryld[BC_Mryld[,5]=="ON-ROAD",c(4,6)]
-PM25_S.NON_ROAD <- BC_Mryld[BC_Mryld[,5]=="NON-ROAD",c(4,6)]
+BC_Mryld <- NEI[with(NEI, fips == "24510"),]
+BC_Mryld_Year <- aggregate(Emissions ~ year + type, BC_Mryld, sum)
 
 ##sAVING PLOT IN PNG FILE.
 #Open png file
@@ -39,23 +37,13 @@ png(filename = "plot3.png", width = 480, height = 480, units = "px", pointsize =
     bg = "white", res = NA, family = "", restoreConsole = TRUE)
 
 #Boxplot creation
-p <- ggplot(BC_Mryld, aes(x=year, y=log10(Emissions), group=year)) + geom_boxplot()
-p <- p + facet_grid(type ~ .)
-p <- p + stat_summary(fun.y=mean, geom="point", shape=20, size=4, color = "red")
+p <- ggplot(BC_Mryld_Year, aes(x=year, y=Emissions, color=type)) + geom_line() + geom_point() + ylab(expression("Total PM"['25']*" Emissions"))+ ggtitle(expression("Total emissions by type of source in Baltimore City"))
 p
 
 #Close png file
 dev.off() 
 
 
-## It seems the "NON_ROAD" and "NON_POINT" sources have seen decreases
-#in emissions from 1999–2008 for Baltimore City, but It is hard to appreciate the
-# differences among the four years in the charts...
-#...so let's see the values of the means
-sapply(split(PM25_S.NON_ROAD, PM25_S.NON_ROAD$year),summary)
-sapply(split(PM25_S.NONPOINT, PM25_S.NONPOINT$year),summary)
-sapply(split(PM25_S.ON_ROAD, PM25_S.ON_ROAD$year),summary)
-sapply(split(PM25_S.POINT, PM25_S.POINT$year),summary)
+## It seems the "ON_ROAD", "NON_POINT" and "NON_ROAD" sources have seen decreases
+#in emissions from 1999-2008 for Baltimore City.
 
-##An analitically observation shows that the sources that had a reduction between
-#the years were the "NONPOINT" and "ON_ROAD" sources.

@@ -15,16 +15,17 @@ if(!file.exists("./summarySCC_PM25.rds")) {
 
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
-
+NEI$year <- as.factor(NEI$year)
 
 
 ##########################################################################################
 ##########################################################################################
 ## 4. Across the United States, how have emissions from 
-# coal combustion-related sources changed from 1999–2008?
+# coal combustion-related sources changed from 1999-2008?
 
 CoalSources <- SCC[grep("Coal", SCC$EI.Sector),1]
-NEI_CS <- NEI[NEI$SCC %in% CoalSources, c(4,6)]
+NEI_CoalS <- NEI[NEI$SCC %in% CoalSources, c(4,6)]
+NEI_CS <- sapply(split(NEI_CoalS$Emissions, NEI_CoalS$year), sum)
 
 ##sAVING PLOT IN PNG FILE.
 #Open png file
@@ -32,11 +33,12 @@ png(filename = "plot4.png", width = 480, height = 480, units = "px", pointsize =
     bg = "white", res = NA, family = "", restoreConsole = TRUE)
 
 #Boxplot creation
-p <- ggplot(NEI_CS, aes(x=year, y=log10(Emissions), group=year))+ geom_boxplot()
-p
+barplot(NEI_CS, xlab = "Year",
+        ylab = expression("Total PM"['25']*" emissions"), 
+        main = expression("Total PM"['25']*" emissions related to coal combustion"))
 
 #Close png file
 dev.off()
 
-# Across the United States and among the years 1999–2008, the emissions from 
+# Across the United States and among the years 1999-2008, the emissions from 
 # coal combustion-related sources have increased.
